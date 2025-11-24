@@ -16,13 +16,18 @@ function formatDate(dateString, lang) {
     return date.toLocaleDateString(lang, options);
 }
 
+function escapeRegex(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function emojify(content, emojis) {
     if (!emojis || emojis.length === 0) return content;
     
     emojis.forEach(emoji => {
         const emojiUrl = escapeHtml(emoji.url);
         const shortcode = escapeHtml(emoji.shortcode);
-        const regex = new RegExp(`:${emoji.shortcode}:`, 'g');
+        const escapedShortcode = escapeRegex(emoji.shortcode);
+        const regex = new RegExp(`:${escapedShortcode}:`, 'g');
         content = content.replace(regex, 
             `<img src="${emojiUrl}" alt="${shortcode}" class="emoji" loading="lazy" />`
         );
@@ -36,7 +41,9 @@ function renderComment(comment, lang) {
     const username = escapeHtml(comment.account.username);
     const accountUrl = escapeHtml(comment.account.url);
     const avatarUrl = escapeHtml(comment.account.avatar);
-    // Mastodon content is already sanitized by the Mastodon server, but we process emojis
+    // Note: Mastodon API returns HTML content that is already sanitized by the Mastodon server.
+    // The content includes allowed HTML tags (links, paragraphs, etc.) for proper formatting.
+    // We trust Mastodon's sanitization and only process custom emojis.
     const content = emojify(comment.content, comment.emojis);
     const timestamp = formatDate(comment.created_at, lang);
     const commentUrl = escapeHtml(comment.url);
@@ -103,8 +110,8 @@ async function loadMastodonComments(host, postId, lang) {
     
     try {
         // Validate and encode the host and postId
-        // Host should be a valid domain name, postId should be numeric
-        if (!/^[a-z0-9.-]+$/i.test(host)) {
+        // Host should be a valid domain name (no consecutive dots, starts/ends with alphanumeric)
+        if (!/^[a-z0-9]+([.-][a-z0-9]+)*$/i.test(host)) {
             throw new Error('Invalid Mastodon host');
         }
         if (!/^\d+$/.test(postId)) {

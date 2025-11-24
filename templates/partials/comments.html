@@ -89,6 +89,8 @@
         data-mastodon-post-id="{{ page.extra.mastodon_post_id }}"
     {% endif %}
     {% if page.extra.mastodon_post_url %}
+        {#- Extract host and post ID from Mastodon URL (e.g., https://mastodon.social/@user/123456789) -#}
+        {#- Note: This assumes a standard Mastodon URL format. The JavaScript will validate the extracted values. -#}
         {%- set post_parts = page.extra.mastodon_post_url | split(pat="/") -%}
         {%- set post_id = post_parts | last -%}
         {%- set host_parts = page.extra.mastodon_post_url | split(pat="//") -%}
