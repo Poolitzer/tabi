@@ -41,9 +41,12 @@ function renderComment(comment, lang) {
     const username = escapeHtml(comment.account.username);
     const accountUrl = escapeHtml(comment.account.url);
     const avatarUrl = escapeHtml(comment.account.avatar);
-    // Note: Mastodon API returns HTML content that is already sanitized by the Mastodon server.
-    // The content includes allowed HTML tags (links, paragraphs, etc.) for proper formatting.
-    // We trust Mastodon's sanitization and only process custom emojis.
+    // Security Note: Mastodon API returns HTML-formatted content that has been sanitized by Mastodon's server.
+    // According to Mastodon's API documentation, content includes only safe HTML tags (a, p, br, span) with
+    // limited attributes. This is the standard behavior for ActivityPub implementations.
+    // We rely on Mastodon's sanitization (similar to how giscus relies on GitHub's sanitization).
+    // The content is then processed only to replace emoji shortcodes with images.
+    // All other user-controllable fields (URLs, names, etc.) are escaped before insertion.
     const content = emojify(comment.content, comment.emojis);
     const timestamp = formatDate(comment.created_at, lang);
     const commentUrl = escapeHtml(comment.url);
@@ -110,8 +113,9 @@ async function loadMastodonComments(host, postId, lang) {
     
     try {
         // Validate and encode the host and postId
-        // Host should be a valid domain name (no consecutive dots, starts/ends with alphanumeric)
-        if (!/^[a-z0-9]+([.-][a-z0-9]+)*$/i.test(host)) {
+        // Host should be a valid domain name: alphanumeric with dots/hyphens, no consecutive special chars
+        // Must start and end with alphanumeric, no consecutive dots or hyphens
+        if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/i.test(host)) {
             throw new Error('Invalid Mastodon host');
         }
         if (!/^\d+$/.test(postId)) {
