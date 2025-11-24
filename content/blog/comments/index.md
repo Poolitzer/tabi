@@ -1,8 +1,8 @@
 +++
-title = "Add comments to your posts with these 4 comment systems"
+title = "Add comments to your posts with these 5 comment systems"
 date = 2023-07-14
-updated = 2023-07-26
-description = "Discover how to enable a comments section on your posts using giscus, utterances, Hyvor Talk, or Isso, enabling reader interaction and feedback."
+updated = 2025-11-24
+description = "Discover how to enable a comments section on your posts using giscus, utterances, Hyvor Talk, Isso, or Mastodon, enabling reader interaction and feedback."
 
 [taxonomies]
 tags = ["showcase", "tutorial"]
@@ -14,7 +14,7 @@ toc = true
 social_media_card = "social_cards/blog_comments.jpg"
 +++
 
-tabi currently supports four comment systems: [giscus](https://giscus.app/), [utterances](https://utteranc.es/), [Hyvor Talk](https://talk.hyvor.com/), and [Isso](https://isso-comments.de/).
+tabi currently supports five comment systems: [giscus](https://giscus.app/), [utterances](https://utteranc.es/), [Hyvor Talk](https://talk.hyvor.com/), [Isso](https://isso-comments.de/), and [Mastodon](https://joinmastodon.org/).
 
 giscus and utterances are open-source projects that let you add a comments section to your website using GitHub issues (utterances) or discussions (giscus). They are perfect for static site generators like Zola, since they enable your readers to interact and leave comments on your posts without requiring a traditional backend or database.
 
@@ -31,6 +31,8 @@ Both are great tools for adding comments to your blog, but giscus has a few adva
 Hyvor Talk is a paid privacy-focused commenting platform. It offers all of the giscus' advantages, and a few more, like moderation and spam detection.
 
 Isso is an open-source self-hosted commenting system that stores comments in its own database. One of its main advantages is privacy; it does not share user data with third parties. It also has a lightweight and clean interface, making it easy for your visitors to leave comments. Isso also allows anonymous comments, potentially increasing user engagement on your website.
+
+Mastodon is a decentralized social network that can be used for comments. With this system, you create a post on Mastodon for each blog post, and replies to that post are displayed as comments on your blog. Users can interact with the content directly on Mastodon, and their replies will automatically appear on your blog. This approach combines the benefits of social media engagement with blog comments, allowing your readers to participate in discussions without needing a separate account on your website.
 
 ## Setup
 
@@ -110,11 +112,51 @@ page_author_hashes = ""
 lazy_loading = true
 ```
 
+### Mastodon
+
+To use Mastodon for comments, first configure the default Mastodon instance in your `config.toml`:
+
+```toml
+[extra.mastodon]
+enabled_for_all_posts = false
+automatic_loading = true
+host = "mastodon.social"  # Your Mastodon instance host (without https://)
+```
+
+Then, for each post where you want to enable Mastodon comments, you need to:
+
+1. Create a post (toot) on Mastodon about your blog post
+2. Get the URL of that Mastodon post (e.g., `https://mastodon.social/@username/123456789`)
+3. Add the Mastodon post information to your blog post's front matter:
+
+```toml,hl_lines=09-11
+title = "My awesome blog post"
+date = 2024-11-24
+description = "An interesting article about something."
+
+[taxonomies]
+tags = ["tutorial"]
+
+[extra]
+mastodon = true
+mastodon_post_url = "https://mastodon.social/@username/123456789"
+```
+
+Alternatively, if you know the post ID and want to specify a different host than the default, you can use:
+
+```toml
+[extra]
+mastodon = true
+mastodon_post_id = "123456789"
+```
+
+The Mastodon system will fetch all replies to your post and display them as comments on your blog. Users can click a link to comment directly on Mastodon.
+
 ### Common settings
 
 Setting `enabled_for_all_posts = true` for a comment system will enable it globally.
 
-Alternatively, enable comments on an individual post's front matter by adding the name of the system (`utterances`, `giscus`, `hyvortalk`, or `isso`) `= true`. For example, this is how you would enable giscus:
+Alternatively, enable comments on an individual post's front matter by adding the name of the system (`utterances`, `giscus`, `hyvortalk`, `isso`, or `mastodon`) `= true`. For example, this is how you would enable giscus:
 
 ```toml,hl_lines=09-10
 title = "Bears, Beets, Battlestar Galactica: The Dwight Schrute Guide to Life"
@@ -130,7 +172,7 @@ giscus = true
 
 If you accidentally enable more than one system, your site will fail to build with an error.
 
-If your site has multiple languages with matching posts (like this demo), and you'd like to share comments between languages, you must use `issue_term = "slug"` (for giscus and utterances) or `page_id_is_slug = true` (for Hyvor Talk or Isso). This will use the name of the Markdown file (sans the language tag) as the identifier. All other options will create different comment sections for each language.
+If your site has multiple languages with matching posts (like this demo), and you'd like to share comments between languages, you must use `issue_term = "slug"` (for giscus and utterances) or `page_id_is_slug = true` (for Hyvor Talk or Isso). For Mastodon, use the same `mastodon_post_url` or `mastodon_post_id` across all language versions of the post. This will use the name of the Markdown file (sans the language tag) as the identifier. All other options will create different comment sections for each language.
 
 ## Live example
 

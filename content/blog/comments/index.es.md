@@ -1,8 +1,8 @@
 +++
-title = "Añade comentarios a tus publicaciones con estas 4 plataformas"
+title = "Añade comentarios a tus publicaciones con estas 5 plataformas"
 date = 2023-07-14
-updated = 2023-07-26
-description = "Descubre cómo habilitar una sección de comentarios en tus publicaciones usando giscus, utterances, Hyvor Talk, o Isso, permitiendo la interacción y feedback de los lectores."
+updated = 2025-11-24
+description = "Descubre cómo habilitar una sección de comentarios en tus publicaciones usando giscus, utterances, Hyvor Talk, Isso, o Mastodon, permitiendo la interacción y feedback de los lectores."
 
 [taxonomies]
 tags = ["funcionalidad", "tutorial"]
@@ -14,7 +14,7 @@ toc = true
 social_media_card = "social_cards/es_blog_comments.jpg"
 +++
 
-tabi actualmente soporta cuatro sistemas de comentarios: [giscus](https://giscus.app/es) y [utterances](https://utteranc.es/), [Hyvor Talk](https://talk.hyvor.com/) e [Isso](https://isso-comments.de/).
+tabi actualmente soporta cinco sistemas de comentarios: [giscus](https://giscus.app/es), [utterances](https://utteranc.es/), [Hyvor Talk](https://talk.hyvor.com/), [Isso](https://isso-comments.de/) y [Mastodon](https://joinmastodon.org/).
 
 giscus y utterances son proyectos de código abierto que te permiten añadir una sección de comentarios a tu sitio web usando las «issues» (utterances) o «discussions» (giscus) de GitHub. Son perfectos para generadores de sitios estáticos como Zola, ya que permiten a tus lectores interactuar y dejar comentarios en tus publicaciones sin requerir un backend tradicional ni una base de datos.
 
@@ -31,6 +31,8 @@ Ambas son excelentes herramientas para agregar comentarios a tu blog, pero giscu
 Hyvor Talk es una plataforma de comentarios de pago centrada en la privacidad. Ofrece todas las ventajas de giscus y algunas más, como moderación y detección de spam.
 
 Isso es un sistema de comentarios de código abierto y autoalojado que almacena los comentarios en su propia base de datos. Una de sus principales ventajas es la privacidad; no comparte los datos de los usuarios con terceros. También tiene una interfaz ligera y limpia, lo que facilita que tus visitantes dejen comentarios. Isso también permite comentarios anónimos, lo que podría aumentar la participación de los usuarios en tu sitio web.
+
+Mastodon es una red social descentralizada que se puede utilizar para comentarios. Con este sistema, creas una publicación en Mastodon para cada entrada de blog, y las respuestas a esa publicación se muestran como comentarios en tu blog. Los usuarios pueden interactuar con el contenido directamente en Mastodon, y sus respuestas aparecerán automáticamente en tu blog. Este enfoque combina los beneficios del compromiso en redes sociales con los comentarios del blog, permitiendo que tus lectores participen en las discusiones sin necesidad de una cuenta separada en tu sitio web.
 
 ## Configuración
 
@@ -110,11 +112,51 @@ page_author_hashes = ""
 lazy_loading = true
 ```
 
+### Mastodon
+
+Para usar Mastodon para comentarios, primero configura la instancia de Mastodon predeterminada en tu `config.toml`:
+
+```toml
+[extra.mastodon]
+enabled_for_all_posts = false
+automatic_loading = true
+host = "mastodon.social"  # Tu instancia de Mastodon (sin https://)
+```
+
+Luego, para cada publicación donde quieras habilitar comentarios de Mastodon, necesitas:
+
+1. Crear una publicación (toot) en Mastodon sobre tu entrada de blog
+2. Obtener la URL de esa publicación de Mastodon (por ejemplo, `https://mastodon.social/@usuario/123456789`)
+3. Añadir la información de la publicación de Mastodon al front matter de tu entrada de blog:
+
+```toml,hl_lines=09-11
+title = "Mi increíble entrada de blog"
+date = 2024-11-24
+description = "Un artículo interesante sobre algo."
+
+[taxonomies]
+tags = ["tutorial"]
+
+[extra]
+mastodon = true
+mastodon_post_url = "https://mastodon.social/@usuario/123456789"
+```
+
+Alternativamente, si conoces el ID de la publicación y quieres especificar un host diferente al predeterminado, puedes usar:
+
+```toml
+[extra]
+mastodon = true
+mastodon_post_id = "123456789"
+```
+
+El sistema de Mastodon obtendrá todas las respuestas a tu publicación y las mostrará como comentarios en tu blog. Los usuarios pueden hacer clic en un enlace para comentar directamente en Mastodon.
+
 ### Ajustes comunes
 
 La opción `enabled_for_all_posts = true` habilitará globalmente el sistema de comentarios correspondiente.
 
-Alternativamente, puedes habilitar los comentarios en publicaciones concretas añadiendo el nombre del sistema (`utterances`, `giscus`, `hyvortalk` o `isso`) `= true`. Por ejemplo, así habilitarías giscus:
+Alternativamente, puedes habilitar los comentarios en publicaciones concretas añadiendo el nombre del sistema (`utterances`, `giscus`, `hyvortalk`, `isso` o `mastodon`) `= true`. Por ejemplo, así habilitarías giscus:
 
 ```toml,hl_lines=09-10
 title = "Los molinos de viento de mi vida: reflexiones de un escudero"
@@ -130,7 +172,7 @@ giscus = true
 
 Si accidentalmente habilitas más de un sistema, Zola mostrará un error.
 
-Si tu web tiene múltiples idiomas con publicaciones coincidentes (como esta demo), y te gustaría compartir comentarios entre idiomas, debes usar `issue_term = "slug"` (en el caso de giscus y utterances) o `page_id_is_slug = true` (para Hyvor Talk e Isso). Esto usará el nombre del archivo Markdown (sin la etiqueta de idioma) como identificador. Todas las demás opciones crearán diferentes secciones de comentarios para cada idioma.
+Si tu web tiene múltiples idiomas con publicaciones coincidentes (como esta demo), y te gustaría compartir comentarios entre idiomas, debes usar `issue_term = "slug"` (en el caso de giscus y utterances) o `page_id_is_slug = true` (para Hyvor Talk e Isso). Para Mastodon, usa la misma `mastodon_post_url` o `mastodon_post_id` en todas las versiones de idioma de la publicación. Esto usará el nombre del archivo Markdown (sin la etiqueta de idioma) como identificador. Todas las demás opciones crearán diferentes secciones de comentarios para cada idioma.
 
 
 ## Ejemplo en vivo

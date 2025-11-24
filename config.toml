@@ -453,6 +453,16 @@ voting = true
 page_author_hashes = ""  # hash (or list of hashes) of the author.
 lazy_loading = true  # Loads when the comments are in the viewport (using the Intersection Observer API).
 
+# Mastodon support for comments. https://docs.joinmastodon.org/
+# Each blog post needs a corresponding Mastodon post. The post URL or ID is used to fetch replies via the Mastodon API.
+# Setup instructions: https://welpo.github.io/tabi/blog/comments/#setup
+[extra.mastodon]
+enabled_for_all_posts = false  # Enables mastodon on all posts. It can be enabled on individual posts by setting `mastodon = true` in the [extra] section of a post's front matter.
+automatic_loading = true  # If set to false, a "Load comments" button will be shown.
+host = "mastodon.social"  # Your Mastodon instance host (without https://)
+# For each post, set either mastodon_post_id or mastodon_post_url in the post's front matter [extra] section.
+# The mastodon_post_id is the numeric ID of the post; mastodon_post_url is the full URL to the Mastodon post.
+
 [extra.webmentions]
 # To disable for a specific section or page, set webmentions = false in that page/section's front matter's [extra] section.
 enable = false

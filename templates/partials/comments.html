@@ -82,6 +82,28 @@
     data-page-author-hashes="{{ config.extra.isso.page_author_hashes }}"
     data-lazy-loading="{{ config.extra.isso.lazy_loading }}"
     >
+
+{% elif comment_system == "mastodon" %}
+    data-mastodon-host="{{ config.extra.mastodon.host }}"
+    {% if page.extra.mastodon_post_id %}
+        data-mastodon-post-id="{{ page.extra.mastodon_post_id }}"
+    {% endif %}
+    {% if page.extra.mastodon_post_url %}
+        {%- set post_parts = page.extra.mastodon_post_url | split(pat="/") -%}
+        {%- set post_id = post_parts | last -%}
+        {%- set host_parts = page.extra.mastodon_post_url | split(pat="//") -%}
+        {%- set host_and_path = host_parts | last | split(pat="/") -%}
+        {%- set instance_host = host_and_path | first -%}
+        data-mastodon-post-id="{{ post_id }}"
+        data-mastodon-host="{{ instance_host }}"
+        data-mastodon-post-url="{{ page.extra.mastodon_post_url }}"
+    {% endif %}
+    {% if config.extra.mastodon.lang %}
+        data-page-language="{{ config.extra.mastodon.lang }}"
+    {% else %}
+        data-page-language="{{ lang }}"
+    {% endif %}
+    >
 {% endif %}
 
 {% if automatic_loading %}

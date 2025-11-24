@@ -330,7 +330,7 @@ Current section extra: {% if current_section %}{{ current_section.extra | json_e
 
         {#- Comments -#}
         {#- Check if comments are enabled, checking that they are not disabled on the specific page -#}
-        {% set systems = ["giscus", "utterances", "hyvortalk", "isso"] %}
+        {% set systems = ["giscus", "utterances", "hyvortalk", "isso", "mastodon"] %}
         {% set enabled_systems = 0 %}
         {% set comment_system = "" %}
 

@@ -1,8 +1,8 @@
 +++
-title = "Afegeix comentaris a les teves publicacions amb aquestes 4 plataformes"
+title = "Afegeix comentaris a les teves publicacions amb aquestes 5 plataformes"
 date = 2023-07-14
-updated = 2023-07-26
-description = "Descobreix com habilitar una secció de comentaris a les teves publicacions utilitzant giscus, utterances, Hyvor Talk, o Isso, permetent la interacció i feedback dels lectors."
+updated = 2025-11-24
+description = "Descobreix com habilitar una secció de comentaris a les teves publicacions utilitzant giscus, utterances, Hyvor Talk, Isso, o Mastodon, permetent la interacció i feedback dels lectors."
 
 [taxonomies]
 tags = ["funcionalitat", "tutorial"]
@@ -14,7 +14,7 @@ toc = true
 social_media_card = "social_cards/ca_blog_comments.jpg"
 +++
 
-tabi actualment suporta quatre sistemes de comentaris: [giscus](https://giscus.app/ca) i [utterances](https://utteranc.es/), [Hyvor Talk](https://talk.hyvor.com/) i [Isso](https://isso-comments.de/).
+tabi actualment suporta cinc sistemes de comentaris: [giscus](https://giscus.app/ca), [utterances](https://utteranc.es/), [Hyvor Talk](https://talk.hyvor.com/), [Isso](https://isso-comments.de/) i [Mastodon](https://joinmastodon.org/).
 
 giscus i utterances són projectes de codi obert que et permeten afegir una secció de comentaris al teu lloc web utilitzant les «issues» (utterances) o «discussions» (giscus) de GitHub. Són perfectes per a generadors de llocs estàtics com Zola, ja que permeten als teus lectors interactuar i deixar comentaris a les teves publicacions sense requerir un backend tradicional o una base de dades.
 
@@ -31,6 +31,8 @@ Ambdues són excel·lents eines per afegir comentaris al teu blog, però giscus 
 Hyvor Talk és una plataforma de comentaris de pagament centrada en la privadesa. Ofereix tots els avantatges del giscus i alguns més, com la moderació i la detecció de correu brossa.
 
 Isso és un sistema de comentaris de codi obert autoallotjat que emmagatzema els comentaris a la seva pròpia base de dades. Un dels seus principals avantatges és la privacitat; no comparteix les dades dels usuaris amb tercers. També té una interfície lleugera i neta, facilitant als teus visitants deixar comentaris. Isso també permet comentaris anònims, potencialment augmentant la participació dels usuaris a la teva pàgina web.
+
+Mastodon és una xarxa social descentralitzada que es pot utilitzar per a comentaris. Amb aquest sistema, crees una publicació a Mastodon per a cada entrada de blog, i les respostes a aquesta publicació es mostren com a comentaris al teu blog. Els usuaris poden interactuar amb el contingut directament a Mastodon, i les seves respostes apareixeran automàticament al teu blog. Aquest enfocament combina els beneficis del compromís a les xarxes socials amb els comentaris del blog, permetent que els teus lectors participin en les discussions sense necessitat d'un compte separat al teu lloc web.
 
 ## Configuració
 
@@ -109,11 +111,51 @@ page_author_hashes = ""
 lazy_loading = true
 ```
 
+### Mastodon
+
+Per utilitzar Mastodon per a comentaris, primer configura la instància de Mastodon per defecte al teu `config.toml`:
+
+```toml
+[extra.mastodon]
+enabled_for_all_posts = false
+automatic_loading = true
+host = "mastodon.social"  # La teva instància de Mastodon (sense https://)
+```
+
+Després, per a cada publicació on vulguis habilitar comentaris de Mastodon, necessites:
+
+1. Crear una publicació (toot) a Mastodon sobre la teva entrada de blog
+2. Obtenir l'URL d'aquesta publicació de Mastodon (per exemple, `https://mastodon.social/@usuari/123456789`)
+3. Afegir la informació de la publicació de Mastodon al front matter de la teva entrada de blog:
+
+```toml,hl_lines=09-11
+title = "La meva increïble entrada de blog"
+date = 2024-11-24
+description = "Un article interessant sobre alguna cosa."
+
+[taxonomies]
+tags = ["tutorial"]
+
+[extra]
+mastodon = true
+mastodon_post_url = "https://mastodon.social/@usuari/123456789"
+```
+
+Alternativament, si coneixes l'ID de la publicació i vols especificar un host diferent del predeterminat, pots utilitzar:
+
+```toml
+[extra]
+mastodon = true
+mastodon_post_id = "123456789"
+```
+
+El sistema de Mastodon obtindrà totes les respostes a la teva publicació i les mostrarà com a comentaris al teu blog. Els usuaris poden fer clic en un enllaç per comentar directament a Mastodon.
+
 ### Configuracions comunes
 
 La opció `enabled_for_all_posts = true` habilita globalment el sistema de comentaris corresponent.
 
-Alternativament, pots habilitar els comentaris a publicacions concretes afegint el nom del sistema (`utterances`, `giscus`, `hyvortalk` o `isso`) ` = true`. Per exemple, així és com habilitaries giscus:
+Alternativament, pots habilitar els comentaris a publicacions concretes afegint el nom del sistema (`utterances`, `giscus`, `hyvortalk`, `isso` o `mastodon`) ` = true`. Per exemple, així és com habilitaries giscus:
 
 ```toml,hl_lines=09-10
 title = "L'art de l'entremaliadura segons Shin-Chan
@@ -129,7 +171,7 @@ giscus = true
 
 Si accidentalment habilites més d'un sistema, Zola mostrarà un error.
 
-Si el teu lloc web té múltiples idiomes amb publicacions coincidents (com aquesta demo), i t'agradaria compartir comentaris entre idiomes, has d'utilitzar `issue_term = "slug"` (per giscus y utterances) o `page_id_is_slug = true` (per Hyvor Talk o Isso). Això utilitzarà el nom de l'arxiu Markdown (sense l'etiqueta d'idioma) com a identificador. Totes les altres opcions crearan diferents seccions de comentaris per a cada idioma.
+Si el teu lloc web té múltiples idiomes amb publicacions coincidents (com aquesta demo), i t'agradaria compartir comentaris entre idiomes, has d'utilitzar `issue_term = "slug"` (per giscus y utterances) o `page_id_is_slug = true` (per Hyvor Talk o Isso). Per a Mastodon, utilitza la mateixa `mastodon_post_url` o `mastodon_post_id` en totes les versions d'idioma de la publicació. Això utilitzarà el nom de l'arxiu Markdown (sense l'etiqueta d'idioma) com a identificador. Totes les altres opcions crearan diferents seccions de comentaris per a cada idioma.
 
 ## Exemple en viu
 
