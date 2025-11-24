@@ -20,9 +20,11 @@ function emojify(content, emojis) {
     if (!emojis || emojis.length === 0) return content;
     
     emojis.forEach(emoji => {
+        const emojiUrl = escapeHtml(emoji.url);
+        const shortcode = escapeHtml(emoji.shortcode);
         const regex = new RegExp(`:${emoji.shortcode}:`, 'g');
         content = content.replace(regex, 
-            `<img src="${emoji.url}" alt="${emoji.shortcode}" class="emoji" loading="lazy" />`
+            `<img src="${emojiUrl}" alt="${shortcode}" class="emoji" loading="lazy" />`
         );
     });
     
@@ -32,27 +34,32 @@ function emojify(content, emojis) {
 function renderComment(comment, lang) {
     const displayName = escapeHtml(comment.account.display_name || comment.account.username);
     const username = escapeHtml(comment.account.username);
-    const accountUrl = comment.account.url;
-    const avatarUrl = comment.account.avatar;
+    const accountUrl = escapeHtml(comment.account.url);
+    const avatarUrl = escapeHtml(comment.account.avatar);
+    // Mastodon content is already sanitized by the Mastodon server, but we process emojis
     const content = emojify(comment.content, comment.emojis);
     const timestamp = formatDate(comment.created_at, lang);
-    const commentUrl = comment.url;
+    const commentUrl = escapeHtml(comment.url);
     
     let attachmentsHtml = '';
     if (comment.media_attachments && comment.media_attachments.length > 0) {
         attachmentsHtml = '<div class="mastodon-attachments">';
         comment.media_attachments.forEach(media => {
+            const mediaUrl = escapeHtml(media.url);
+            const previewUrl = escapeHtml(media.preview_url);
+            const mimeType = escapeHtml(media.mime_type || '');
+            
             if (media.type === 'image') {
-                attachmentsHtml += `<a href="${media.url}" target="_blank" rel="noopener noreferrer">
-                    <img src="${media.preview_url}" alt="${escapeHtml(media.description || 'Image')}" loading="lazy" />
+                attachmentsHtml += `<a href="${mediaUrl}" target="_blank" rel="noopener noreferrer">
+                    <img src="${previewUrl}" alt="${escapeHtml(media.description || 'Image')}" loading="lazy" />
                 </a>`;
             } else if (media.type === 'video' || media.type === 'gifv') {
-                attachmentsHtml += `<video controls preload="metadata" poster="${media.preview_url}">
-                    <source src="${media.url}" type="${media.mime_type || 'video/mp4'}">
+                attachmentsHtml += `<video controls preload="metadata" poster="${previewUrl}">
+                    <source src="${mediaUrl}" type="${mimeType || 'video/mp4'}">
                 </video>`;
             } else if (media.type === 'audio') {
                 attachmentsHtml += `<audio controls preload="metadata">
-                    <source src="${media.url}" type="${media.mime_type || 'audio/mpeg'}">
+                    <source src="${mediaUrl}" type="${mimeType || 'audio/mpeg'}">
                 </audio>`;
             }
         });
@@ -95,8 +102,17 @@ async function loadMastodonComments(host, postId, lang) {
     const commentsContainer = document.getElementById('mastodon-comments-list');
     
     try {
+        // Validate and encode the host and postId
+        // Host should be a valid domain name, postId should be numeric
+        if (!/^[a-z0-9.-]+$/i.test(host)) {
+            throw new Error('Invalid Mastodon host');
+        }
+        if (!/^\d+$/.test(postId)) {
+            throw new Error('Invalid Mastodon post ID');
+        }
+        
         // Fetch the post context (replies)
-        const response = await fetch(`https://${host}/api/v1/statuses/${postId}/context`);
+        const response = await fetch(`https://${encodeURIComponent(host)}/api/v1/statuses/${encodeURIComponent(postId)}/context`);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -129,11 +145,12 @@ function initMastodon() {
         }
         
         // Create the comments structure
+        const escapedPostUrl = postUrl ? escapeHtml(postUrl) : '';
         const commentsHtml = `
             <div class="mastodon-comments">
                 <div class="mastodon-comments-header">
                     <h3>Comments</h3>
-                    ${postUrl ? `<a href="${postUrl}" target="_blank" rel="noopener noreferrer" class="mastodon-comment-link">Comment on Mastodon</a>` : ''}
+                    ${escapedPostUrl ? `<a href="${escapedPostUrl}" target="_blank" rel="noopener noreferrer" class="mastodon-comment-link">Comment on Mastodon</a>` : ''}
                 </div>
                 <div id="mastodon-comments-list">
                     <p class="mastodon-loading">Loading comments...</p>
