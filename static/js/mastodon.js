@@ -157,6 +157,10 @@ function initMastodon() {
         
         // Create the comments structure
         const escapedPostUrl = postUrl ? escapeHtml(postUrl) : '';
+        const replyLinkHtml = escapedPostUrl 
+            ? `<p class="mastodon-reply-link"><a href="${escapedPostUrl}" target="_blank" rel="noopener noreferrer" class="mastodon-comment-link">Reply on Mastodon</a></p>` 
+            : '';
+        
         const commentsHtml = `
             <div class="mastodon-comments">
                 <div class="mastodon-comments-header">
@@ -166,6 +170,7 @@ function initMastodon() {
                 <div id="mastodon-comments-list">
                     <p class="mastodon-loading">Loading comments...</p>
                 </div>
+                ${replyLinkHtml}
             </div>
         `;
         
