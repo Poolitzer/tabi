@@ -99,11 +99,26 @@
                             <a href="{{ post.permalink }}">
                                 {% if post.extra.local_image %}
                                     {% set meta = get_image_metadata(path=post.extra.local_image, allow_missing=true) %}
-                                    <img class="thumbnail-image"
-                                        alt="{{ post.extra.local_image }}"
-                                        src="{{ get_url(path=post.extra.local_image) }}"
-                                        {% if meta.width %}width="{{ meta.width }}"{% endif %}
-                                        {% if meta.height %}height="{{ meta.height }}"{% endif %}>
+                                    {% if post.extra.local_image_dark %}
+                                        {# Show light image only in light mode, dark image only in dark mode #}
+                                        {% set meta_dark = get_image_metadata(path=post.extra.local_image_dark, allow_missing=true) %}
+                                        <img class="thumbnail-image img-light"
+                                            alt="{{ post.extra.local_image }}"
+                                            src="{{ get_url(path=post.extra.local_image) }}"
+                                            {% if meta.width %}width="{{ meta.width }}"{% endif %}
+                                            {% if meta.height %}height="{{ meta.height }}"{% endif %}>
+                                        <img class="thumbnail-image img-dark"
+                                            alt="{{ post.extra.local_image_dark }}"
+                                            src="{{ get_url(path=post.extra.local_image_dark) }}"
+                                            {% if meta_dark.width %}width="{{ meta_dark.width }}"{% endif %}
+                                            {% if meta_dark.height %}height="{{ meta_dark.height }}"{% endif %}>
+                                    {% else %}
+                                        <img class="thumbnail-image"
+                                            alt="{{ post.extra.local_image }}"
+                                            src="{{ get_url(path=post.extra.local_image) }}"
+                                            {% if meta.width %}width="{{ meta.width }}"{% endif %}
+                                            {% if meta.height %}height="{{ meta.height }}"{% endif %}>
+                                    {% endif %}
                                 {% elif post.extra.remote_image %}
                                     <img class="thumbnail-image"
                                         alt="{{ post.extra.remote_image }}"

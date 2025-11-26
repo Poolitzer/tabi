@@ -409,6 +409,7 @@ local_image = "img/tabi.webp"
 - `description` es la descripción del proyecto.
 - `weight` determina el orden en el que se muestran los proyectos. Cuanto menor sea el peso, más arriba aparecerá el proyecto.
 - `local_image` es la ruta de la imagen del proyecto. Esta imagen se muestra en la página de proyectos.
+- `local_image_dark` es una ruta opcional a una imagen alternativa que se mostrará en modo oscuro. Cuando se establece, `local_image` solo se muestra en modo claro.
 
 Cuando un usuario haga clic en la imagen o el título de un proyecto, será llevado a la página del proyecto. Si prefieres que los usuarios vayan a un enlace externo, puedes establecer `link_to = "https://example.com"` en la sección `[extra]` del archivo `.md` del proyecto.
 
